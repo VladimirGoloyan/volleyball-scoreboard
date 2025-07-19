@@ -15,6 +15,7 @@ import {
   FormControlLabel,
   Switch,
 } from "@mui/material";
+import logo from "./vfa.jpg";
 
 const channel = new BroadcastChannel("scoreboard");
 
@@ -49,31 +50,32 @@ export default function App() {
 }
 
 function Control() {
-  const [teamA, setTeamA] = useState(COUNTRIES[0].name);
-  const [teamB, setTeamB] = useState(COUNTRIES[1].name);
-  const [scoreA, setScoreA] = useState(0);
-  const [scoreB, setScoreB] = useState(0);
-  const [setsA, setSetsA] = useState(0);
-  const [setsB, setSetsB] = useState(0);
-  const [timeoutsA, setTimeoutsA] = useState([false, false]);
-  const [timeoutsB, setTimeoutsB] = useState([false, false]);
-  const [isHidden, setIsHidden] = useState(false);
 
-  useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("scoreState"));
-    if (saved) {
-      setTeamA(saved.teamA);
-      setTeamB(saved.teamB);
-      setScoreA(saved.scoreA);
-      setScoreB(saved.scoreB);
-      setSetsA(saved.setsA);
-      setSetsB(saved.setsB);
-      setTimeoutsA(saved.timeoutsA || [false, false]);
-      setTimeoutsB(saved.timeoutsB || [false, false]);
-      setIsHidden(saved.isHidden || true);
-    }
-  }, []);
+  const saved = localStorage.getItem("scoreState");
+  let initialState = {};
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    initialState.teamA = parsed.teamA;
+    initialState.teamB = parsed.teamB;
+    initialState.scoreA = parsed.scoreA;
+    initialState.scoreB = parsed.scoreB;
+    initialState.setsA = parsed.setsA;
+    initialState.setsB = parsed.setsB;
+    initialState.timeoutsA = parsed.timeoutsA;
+    initialState.timeoutsB = parsed.timeoutsB;
+    initialState.isHidden = parsed.isHidden;
+  }
+  const [teamA, setTeamA] = useState(initialState.teamA || COUNTRIES[0].name);
+  const [teamB, setTeamB] = useState(initialState.teamB ||COUNTRIES[1].name);
+  const [scoreA, setScoreA] = useState(initialState.scoreA || 0);
+  const [scoreB, setScoreB] = useState(initialState.scoreB || 0);
+  const [setsA, setSetsA] = useState(initialState.setsA || 0);
+  const [setsB, setSetsB] = useState(initialState.setsB || 0);
+  const [timeoutsA, setTimeoutsA] = useState(initialState.timeoutsA ||[false, false]);
+  const [timeoutsB, setTimeoutsB] = useState(initialState.timeoutsB ||[false, false]);
+  const [isHidden, setIsHidden] = useState(initialState.isHidden ||false);
 
+  // ✅ Save state whenever something changes
   useEffect(() => {
     const state = {
       teamA,
@@ -86,9 +88,22 @@ function Control() {
       timeoutsB,
       isHidden,
     };
-    channel.postMessage(state);
+    console.log(state);
     localStorage.setItem("scoreState", JSON.stringify(state));
+    channel.postMessage(state);
   }, [teamA, teamB, scoreA, scoreB, setsA, setsB, timeoutsA, timeoutsB, isHidden]);
+
+  const toggleTimeout = (team, index) => {
+    if (team === "A") {
+      const copy = [...timeoutsA];
+      copy[index] = !copy[index];
+      setTimeoutsA(copy);
+    } else {
+      const copy = [...timeoutsB];
+      copy[index] = !copy[index];
+      setTimeoutsB(copy);
+    }
+  };
 
   const resetScores = () => {
     setScoreA(0);
@@ -104,18 +119,7 @@ function Control() {
     setTeamB(COUNTRIES[1].name);
     setTimeoutsA([false, false]);
     setTimeoutsB([false, false]);
-  };
-
-  const toggleTimeout = (team, index) => {
-    if (team === "A") {
-      const copy = [...timeoutsA];
-      copy[index] = !copy[index];
-      setTimeoutsA(copy);
-    } else {
-      const copy = [...timeoutsB];
-      copy[index] = !copy[index];
-      setTimeoutsB(copy);
-    }
+    setIsHidden(false);
   };
 
   return (
@@ -142,7 +146,6 @@ function Control() {
               <InputLabel>Team A</InputLabel>
               <Select
                   value={teamA}
-                  label="Team A"
                   onChange={(e) => setTeamA(e.target.value)}
               >
                 {COUNTRIES.map((c) => (
@@ -170,7 +173,6 @@ function Control() {
               <InputLabel>Team B</InputLabel>
               <Select
                   value={teamB}
-                  label="Team B"
                   onChange={(e) => setTeamB(e.target.value)}
               >
                 {COUNTRIES.map((c) => (
@@ -262,13 +264,13 @@ function Display() {
     setsB: 0,
     timeoutsA: [false, false],
     timeoutsB: [false, false],
-    isHidden: true,
+    isHidden: false,
   });
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("scoreState"));
-    if (saved) setState(saved);
+    const saved = localStorage.getItem("scoreState");
+    if (saved) setState(JSON.parse(saved));
     channel.onmessage = (e) => setState(e.data);
   }, []);
 
@@ -276,12 +278,6 @@ function Display() {
     const interval = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
-
-  const formatDateTime = (date) => {
-    const optionsDate = { year: "numeric", month: "long", day: "numeric" };
-    const optionsTime = { hour: "2-digit", minute: "2-digit", second: "2-digit" };
-    return `${date.toLocaleDateString(undefined, optionsDate)}  ${date.toLocaleTimeString(undefined, optionsTime)}`;
-  };
 
   const getFlagUrl = (countryName) => {
     const c = COUNTRIES.find((c) => c.name === countryName);
@@ -298,6 +294,10 @@ function Display() {
       </Stack>
   );
 
+  const formatDateTime = (date) => {
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+  };
+
   if (state.isHidden) {
     return (
         <Box
@@ -309,36 +309,13 @@ function Display() {
               alignItems: "center",
             }}
         >
-          {/* Replace src with your own logo */}
           <img
-              src="vfa.jpg"
+              src={logo}
               alt="Logo"
               style={{ maxWidth: "60%", maxHeight: "60%" }}
           />
         </Box>
     );
-  }
-
-  const SX = {
-    flag: {
-      width: 300,
-      height: 150,
-      marginTop: 8
-    },
-    teamNameContainer: {
-      width: '35vw'
-    },
-    score: {
-      width: '30vw',
-      display: 'flex',
-      alignItems: 'center'
-    },
-    teamScore: {
-      fontSize: '10vw',
-      width:'12vw',
-      textAlign: 'center',
-    }
-
   }
 
   return (
@@ -353,82 +330,62 @@ function Display() {
             alignItems: "center",
           }}
       >
-        {/* Live Date/Time */}
-        <Box sx={{
-          pt: 4,
-          height: '30vh',
-          mb: 4,
-        }}>
-          <Typography variant="h2">
-            {formatDateTime(now)}
-          </Typography>
+        <Box sx={{ pt: 4, height: "30vh", mb: 4 }}>
+          <Typography variant="h2">{formatDateTime(now)}</Typography>
         </Box>
-        <Box sx={{
-          height: '70vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}>
-        {/* Scoreboard */}
         <Box
             sx={{
+              height: "70vh",
               display: "flex",
-              width: '100vw',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+              flexDirection: "column",
+              alignItems: "center",
             }}
         >
-          {/* Team A */}
-          <Box textAlign="center" sx={SX.teamNameContainer}>
-            <Typography variant="h1">{state.teamA}</Typography>
-            <img
-                src={getFlagUrl(state.teamA)}
-                alt={state.teamA}
-                style={SX.flag}
-            />
-            {renderTimeouts(state.timeoutsA)}
+          <Box
+              sx={{
+                display: "flex",
+                width: "100vw",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+          >
+            <Box textAlign="center" sx={{ width: "35vw" }}>
+              <Typography variant="h1">{state.teamA}</Typography>
+              <img
+                  src={getFlagUrl(state.teamA)}
+                  alt={state.teamA}
+                  style={{ width: 300, height: 150, marginTop: 8 }}
+              />
+              {renderTimeouts(state.timeoutsA)}
+            </Box>
+
+            <Box sx={{ width: "30vw", display: "flex", alignItems: "center" }}>
+              <Typography sx={{ fontSize: "10vw", width: "12vw", textAlign: "center" }}>
+                {state.scoreA}
+              </Typography>
+              <Typography variant="h1" sx={{ width: "6vw", textAlign: "center", fontSize: "10vw" }}>
+                -
+              </Typography>
+              <Typography sx={{ fontSize: "10vw", width: "12vw", textAlign: "center" }}>
+                {state.scoreB}
+              </Typography>
+            </Box>
+
+            <Box textAlign="center" sx={{ width: "35vw" }}>
+              <Typography variant="h1">{state.teamB}</Typography>
+              <img
+                  src={getFlagUrl(state.teamB)}
+                  alt={state.teamB}
+                  style={{ width: 300, height: 150, marginTop: 8 }}
+              />
+              {renderTimeouts(state.timeoutsB)}
+            </Box>
           </Box>
 
-          <Box sx={SX.score} >
-            <Typography sx={SX.teamScore}>
-              {state.scoreA}
-            </Typography>
-            <Typography variant='h1' sx={{width: '6vw', textAlign: 'center', fontSize: '10vw'}}>
-              -
-            </Typography>
-
-            <Typography sx={SX.teamScore}>
-              {state.scoreB}
-            </Typography>
-          </Box>
-
-          {/* Team B */}
-          <Box textAlign="center" sx={SX.teamNameContainer}>
-            <Typography variant="h1">{state.teamB}</Typography>
-            <img
-                src={getFlagUrl(state.teamB)}
-                alt={state.teamB}
-                style={SX.flag}
-            />
-            {renderTimeouts(state.timeoutsB)}
-          </Box>
-        </Box>
-
-          <Box sx={{
-            display: 'flex',
-            width: '10vw',
-            justifyContent: 'space-around',
-          }}>
-            <Typography variant="h1">
-              {state.setsA}
-            </Typography>
-            <Typography variant="h1">
-              -
-            </Typography>
-            <Typography variant="h1">
-              {state.setsB}
-            </Typography>
-
+          <Box sx={{ display: "flex", width: "10vw", justifyContent: "space-around" }}>
+            <Typography variant="h1">{state.setsA}</Typography>
+            <Typography variant="h1">-</Typography>
+            <Typography variant="h1">{state.setsB}</Typography>
           </Box>
         </Box>
       </Box>
