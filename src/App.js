@@ -16,7 +16,41 @@ import {
   Switch,
 } from "@mui/material";
 import logo from "./vfa.jpg";
+import am from "./flags/am.svg";
+import at from "./flags/at.svg";
+import bg from "./flags/bg.svg";
+import cz from "./flags/cz.svg";
+import fr from "./flags/fr.svg";
+import gr from "./flags/gr.svg";
+import hu from "./flags/hu.svg";
+import it from "./flags/it.svg";
+import lv from "./flags/lv.svg";
+import pl from "./flags/pl.svg";
+import ro from "./flags/ro.svg";
+import rs from "./flags/rs.svg";
+import si from "./flags/si.svg";
+import es from "./flags/es.svg";
+import tr from "./flags/tr.svg";
+import ua from "./flags/ua.svg";
 
+const FLAGS = {
+  am,
+  at,
+  bg,
+  cz,
+  fr,
+  gr,
+  hu,
+  it,
+  lv,
+  pl,
+  ro,
+  rs,
+  si,
+  es,
+  tr,
+  ua,
+};
 const channel = new BroadcastChannel("scoreboard");
 
 const COUNTRIES = [
@@ -88,7 +122,6 @@ function Control() {
       timeoutsB,
       isHidden,
     };
-    console.log(state);
     localStorage.setItem("scoreState", JSON.stringify(state));
     channel.postMessage(state);
   }, [teamA, teamB, scoreA, scoreB, setsA, setsB, timeoutsA, timeoutsB, isHidden]);
@@ -119,7 +152,7 @@ function Control() {
     setTeamB(COUNTRIES[1].name);
     setTimeoutsA([false, false]);
     setTimeoutsB([false, false]);
-    setIsHidden(false);
+    setIsHidden(true);
   };
 
   return (
@@ -266,7 +299,6 @@ function Display() {
     timeoutsB: [false, false],
     isHidden: false,
   });
-  const [now, setNow] = useState(new Date());
 
   useEffect(() => {
     const saved = localStorage.getItem("scoreState");
@@ -274,35 +306,29 @@ function Display() {
     channel.onmessage = (e) => setState(e.data);
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   const getFlagUrl = (countryName) => {
     const c = COUNTRIES.find((c) => c.name === countryName);
-    return c ? `https://flagcdn.com/w320/${c.code.toLowerCase()}.png` : "";
+    if (!c) return "";
+    const code = c.code.toLowerCase();
+    return FLAGS[code] || "";
   };
 
   const renderTimeouts = (timeouts) => (
       <Stack direction="row" spacing={1} justifyContent="center" mt={1}>
         {timeouts.map((t, i) => (
-            <Typography key={i} sx={{ fontSize: 40 }}>
+            <Typography key={i} sx={{ fontSize: 60 }}>
               {t ? "●" : "○"}
             </Typography>
         ))}
       </Stack>
   );
 
-  const formatDateTime = (date) => {
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
-  };
-
   if (state.isHidden) {
     return (
         <Box
             sx={{
-              backgroundColor: "#000",
+              backgroundColor: "#fff",
               height: "100vh",
               display: "flex",
               justifyContent: "center",
@@ -330,12 +356,12 @@ function Display() {
             alignItems: "center",
           }}
       >
-        <Box sx={{ pt: 4, height: "30vh", mb: 4 }}>
-          <Typography variant="h2">{formatDateTime(now)}</Typography>
+        <Box sx={{ pt: 8, height: "20vh", mb: 4 }}>
+          <Typography variant="h3" sx={{fontWeight: 800}}>CEV U16 Volleyball European Championship</Typography>
         </Box>
         <Box
             sx={{
-              height: "70vh",
+              height: "80vh",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -349,40 +375,44 @@ function Display() {
                 justifyContent: "space-between",
               }}
           >
-            <Box textAlign="center" sx={{ width: "35vw" }}>
+            <Box textAlign="center" sx={{ width: "30vw" }}>
               <Typography variant="h1">{state.teamA}</Typography>
               <img
                   src={getFlagUrl(state.teamA)}
                   alt={state.teamA}
-                  style={{ width: 300, height: 150, marginTop: 8 }}
+                  style={{ width: 320, height: 200,
+                    objectFit: "cover",
+                    marginTop: 8}}
               />
               {renderTimeouts(state.timeoutsA)}
             </Box>
 
-            <Box sx={{ width: "30vw", display: "flex", alignItems: "center" }}>
-              <Typography sx={{ fontSize: "10vw", width: "12vw", textAlign: "center" }}>
+            <Box sx={{ width: "40vw", display: "flex", alignItems: "center" }}>
+              <Typography sx={{ fontSize: "14vw", width: "20vw", textAlign: "center" }}>
                 {state.scoreA}
               </Typography>
-              <Typography variant="h1" sx={{ width: "6vw", textAlign: "center", fontSize: "10vw" }}>
+              <Typography variant="h1" sx={{ width: "10vw", textAlign: "center", fontSize: "10vw" }}>
                 -
               </Typography>
-              <Typography sx={{ fontSize: "10vw", width: "12vw", textAlign: "center" }}>
+              <Typography sx={{ fontSize: "14vw", width: "20vw", textAlign: "center" }}>
                 {state.scoreB}
               </Typography>
             </Box>
 
-            <Box textAlign="center" sx={{ width: "35vw" }}>
+            <Box textAlign="center" sx={{ width: "30vw" }}>
               <Typography variant="h1">{state.teamB}</Typography>
               <img
                   src={getFlagUrl(state.teamB)}
                   alt={state.teamB}
-                  style={{ width: 300, height: 150, marginTop: 8 }}
+                  style={{ width: 320, height: 200,
+                    objectFit: "cover",
+                    marginTop: 8}}
               />
               {renderTimeouts(state.timeoutsB)}
             </Box>
           </Box>
 
-          <Box sx={{ display: "flex", width: "10vw", justifyContent: "space-around" }}>
+          <Box sx={{ display: "flex", width: "15vw", justifyContent: "space-around" }}>
             <Typography variant="h1">{state.setsA}</Typography>
             <Typography variant="h1">-</Typography>
             <Typography variant="h1">{state.setsB}</Typography>
