@@ -172,9 +172,10 @@ function Control() {
               label="Hide Display (show logo)"
               sx={{ mb: 3 }}
           />
+          <Stack direction="row" spacing={2} justifyContent="space-between" mb={3}>
 
           {/* Team A */}
-          <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+          <Stack direction="column" spacing={2} alignItems="center" mb={2}>
             <FormControl sx={{ minWidth: 160 }}>
               <InputLabel>Team A</InputLabel>
               <Select
@@ -188,20 +189,42 @@ function Control() {
                 ))}
               </Select>
             </FormControl>
-            <Button variant="contained" onClick={() => setScoreA(scoreA + 1)}>
-              +1
-            </Button>
-            <Button
-                variant="outlined"
-                onClick={() => setScoreA(Math.max(scoreA - 1, 0))}
-            >
-              -1
-            </Button>
-            <Typography variant="h6">{scoreA}</Typography>
+            <Typography>Score</Typography>
+            <Stack direction="row" spacing={2} alignItems="center" mb={2} >
+              <Button
+                  variant="outlined"
+                  onClick={() => setScoreA(Math.max(scoreA - 1, 0))}
+              >
+                -
+              </Button>
+              <Typography variant="h6">{scoreA}</Typography>
+              <Button variant="contained" onClick={() => setScoreA(scoreA + 1)}>
+                +
+              </Button>
+            </Stack>
+            <Typography>Set Score</Typography>
+            <Stack direction="row" spacing={2} alignItems="center" mb={2} >
+              <Button variant="outlined" onClick={() => setSetsA(Math.max(setsA - 1, 0))}>-</Button>
+              <Typography>{setsA}</Typography>
+              <Button variant="contained" onClick={() => setSetsA(setsA + 1)}>+</Button>
+            </Stack>
+
+            <Box>
+              <Typography variant="subtitle1">Team A Timeouts</Typography>
+              {timeoutsA.map((t, i) => (
+                  <IconButton
+                      key={i}
+                      onClick={() => toggleTimeout("A", i)}
+                      sx={{ fontSize: 32 }}
+                  >
+                    {t ? "●" : "○"}
+                  </IconButton>
+              ))}
+            </Box>
           </Stack>
 
           {/* Team B */}
-          <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+          <Stack direction="column" spacing={2} alignItems="center" mb={2}>
             <FormControl sx={{ minWidth: 160 }}>
               <InputLabel>Team B</InputLabel>
               <Select
@@ -215,42 +238,31 @@ function Control() {
                 ))}
               </Select>
             </FormControl>
-            <Button variant="contained" onClick={() => setScoreB(scoreB + 1)}>
-              +1
-            </Button>
-            <Button
-                variant="outlined"
-                onClick={() => setScoreB(Math.max(scoreB - 1, 0))}
-            >
-              -1
-            </Button>
-            <Typography variant="h6">{scoreB}</Typography>
-          </Stack>
 
-          {/* Sets */}
-          <Stack direction="row" spacing={2} alignItems="center" mb={2}>
-            <Button onClick={() => setSetsA(setsA + 1)}>A +1</Button>
-            <Typography>{setsA}</Typography>
-            <Button onClick={() => setSetsA(Math.max(setsA - 1, 0))}>A -1</Button>
-            <Button onClick={() => setSetsB(setsB + 1)}>B +1</Button>
-            <Typography>{setsB}</Typography>
-            <Button onClick={() => setSetsB(Math.max(setsB - 1, 0))}>B -1</Button>
-          </Stack>
 
-          {/* Timeouts */}
-          <Stack direction="row" spacing={4} mb={2}>
-            <Box>
-              <Typography variant="subtitle1">Team A Timeouts</Typography>
-              {timeoutsA.map((t, i) => (
-                  <IconButton
-                      key={i}
-                      onClick={() => toggleTimeout("A", i)}
-                      sx={{ fontSize: 32 }}
-                  >
-                    {t ? "●" : "○"}
-                  </IconButton>
-              ))}
-            </Box>
+            <Typography>Score</Typography>
+            <Stack direction="row" spacing={2} alignItems="center" mb={2} >
+
+              <Button
+                  variant="outlined"
+                  onClick={() => setScoreB(Math.max(scoreB - 1, 0))}
+              >
+                -
+              </Button>
+              <Typography variant="h6">{scoreB}</Typography>
+              <Button variant="contained" onClick={() => setScoreB(scoreB + 1)}>
+                +
+              </Button>
+            </Stack>
+
+
+            <Typography>Set Score</Typography>
+            <Stack direction="row" spacing={2} alignItems="center" mb={2} >
+              <Button variant="outlined" onClick={() => setSetsB(Math.max(setsB - 1, 0))}>-</Button>
+              <Typography>{setsB}</Typography>
+              <Button variant="contained" onClick={() => setSetsB(setsB + 1)}>+</Button>
+            </Stack>
+
             <Box>
               <Typography variant="subtitle1">Team B Timeouts</Typography>
               {timeoutsB.map((t, i) => (
@@ -263,6 +275,9 @@ function Control() {
                   </IconButton>
               ))}
             </Box>
+
+          </Stack>
+
           </Stack>
 
           {/* Reset & Display */}
