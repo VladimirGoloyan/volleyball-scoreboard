@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import {BrowserRouter as Router, Routes, Route, Link} from "react-router-dom";
+import {HashRouter as Router, Routes, Route, Link} from "react-router-dom";
 import {
     Container,
     Button,
@@ -372,7 +372,7 @@ function Display() {
             }}
         >
             <Box sx={{pt: 8, height: "20vh", mb: 4}}>
-                <Typography variant="h3" sx={{fontWeight: 800}}>CEV U16 Volleyball European Championship</Typography>
+                <Typography variant="h2" sx={{fontWeight: 800}}>CEV U16 Volleyball European Championship</Typography>
             </Box>
             <Box
                 sx={{
@@ -396,7 +396,7 @@ function Display() {
                             src={getFlagUrl(state.teamA)}
                             alt={state.teamA}
                             style={{
-                                width: 320, height: 200,
+                                width: 500, height: 300,
                                 objectFit: "cover",
                                 marginTop: 8
                             }}
@@ -422,7 +422,7 @@ function Display() {
                             src={getFlagUrl(state.teamB)}
                             alt={state.teamB}
                             style={{
-                                width: 320, height: 200,
+                                width: 500, height: 300,
                                 objectFit: "cover",
                                 marginTop: 8
                             }}
