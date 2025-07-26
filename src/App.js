@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { HashRouter as Router, Routes, Route, Link } from "react-router-dom";
+import {HashRouter as Router, Routes, Route, Link} from "react-router-dom";
 import {
     Container,
     Button,
@@ -162,17 +162,17 @@ function Control() {
     };
 
     const changeSides = () => {
-      const newState = {
-          scoreA: scoreB,
-          scoreB: scoreA,
+        const newState = {
+            scoreA: scoreB,
+            scoreB: scoreA,
             setsA: setsB,
             setsB: setsA,
             teamA: teamB,
             teamB: teamA,
             timeoutsA: timeoutsB,
             timeoutsB: timeoutsA,
-      }
-      setScoreA(newState.scoreA);
+        }
+        setScoreA(newState.scoreA);
         setScoreB(newState.scoreB);
         setSetsA(newState.setsA);
         setSetsB(newState.setsB);
@@ -270,7 +270,8 @@ function Control() {
                         <Button variant="contained" color="success" onClick={changeSides}>
                             ⬅️Switch Sides➡️
                         </Button>
-                        <Button variant="outlined" color="error" disabled={!anthemFlag} onClick={() => setAnthemFlag(null)}>
+                        <Button variant="outlined" color="error" disabled={!anthemFlag}
+                                onClick={() => setAnthemFlag(null)}>
                             Clear Anthem Flag
                         </Button>
                     </Stack>
@@ -412,20 +413,20 @@ function Display() {
             {renderTimeouts(state.timeoutsA)}
         </Box>
 
-        const renderTeamB = () =>
-            <Box textAlign="center" sx={{width: "30vw"}}>
-                <Typography variant="h1">{state.teamB}</Typography>
-                <img
-                    src={getFlagUrl(state.teamB)}
-                    alt={state.teamB}
-                    style={{
-                        width: 500, height: 300,
-                        objectFit: "cover",
-                        marginTop: 8
-                    }}
-                />
-                {renderTimeouts(state.timeoutsB)}
-            </Box>
+    const renderTeamB = () =>
+        <Box textAlign="center" sx={{width: "30vw"}}>
+            <Typography variant="h1">{state.teamB}</Typography>
+            <img
+                src={getFlagUrl(state.teamB)}
+                alt={state.teamB}
+                style={{
+                    width: 500, height: 300,
+                    objectFit: "cover",
+                    marginTop: 8
+                }}
+            />
+            {renderTimeouts(state.timeoutsB)}
+        </Box>
 
     const renderScore = (inverse) => {
         return <Box sx={{width: "40vw", display: "flex", alignItems: "center"}}>
@@ -450,7 +451,7 @@ function Display() {
     }
 
     const renderDisplay = () => {
-       return  <Box
+        return <Box
             sx={{
                 display: "flex",
                 width: "100vw",
@@ -458,19 +459,19 @@ function Display() {
                 justifyContent: "space-between",
             }}
         >
-           {state.isInverse ? (
-               <>
-                   {renderTeamB()}
-                   {renderScore(true)}
-                   {renderTeamA()}
-               </>
-           ) : (
-               <>
-                   {renderTeamA()}
-                   {renderScore(false)}
-                   {renderTeamB()}
-               </>
-           )}
+            {state.isInverse ? (
+                <>
+                    {renderTeamB()}
+                    {renderScore(true)}
+                    {renderTeamA()}
+                </>
+            ) : (
+                <>
+                    {renderTeamA()}
+                    {renderScore(false)}
+                    {renderTeamB()}
+                </>
+            )}
         </Box>
     }
 
@@ -519,20 +520,21 @@ function Display() {
                 />)
                 :
                 <>
-                <Box sx={{pt: 8, height: "20vh", mb: 4}}>
-                <Typography variant="h2" sx={{fontWeight: 800}}>CEV U16 Volleyball European Championship</Typography>
-            </Box>
-            <Box
-                sx={{
-                    height: "80vh",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                }}
-            >
-                {renderDisplay()}
-                {renderSetScore(state.isInverse)}
-            </Box>
+                    <Box sx={{pt: 8, height: "20vh", mb: 4}}>
+                        <Typography variant="h2" sx={{fontWeight: 800}}>CEV U16 Volleyball European
+                            Championship</Typography>
+                    </Box>
+                    <Box
+                        sx={{
+                            height: "80vh",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                        }}
+                    >
+                        {renderDisplay()}
+                        {renderSetScore(state.isInverse)}
+                    </Box>
                 </>
             }
         </Box>
