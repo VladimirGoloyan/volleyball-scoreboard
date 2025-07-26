@@ -109,6 +109,7 @@ function Control() {
     const [timeoutsB, setTimeoutsB] = useState(initialState.timeoutsB || [false, false]);
     const [isHidden, setIsHidden] = useState(initialState.isHidden || false);
     const [isInverse, setIsInverse] = useState(initialState.isInverse || false);
+    const [anthemFlag, setAnthemFlag] = useState(null);
 
     // ✅ Save state whenever something changes
     useEffect(() => {
@@ -123,10 +124,11 @@ function Control() {
             timeoutsB,
             isHidden,
             isInverse,
+            anthemFlag,
         };
         localStorage.setItem("scoreState", JSON.stringify(state));
         channel.postMessage(state);
-    }, [teamA, teamB, scoreA, scoreB, setsA, setsB, timeoutsA, timeoutsB, isHidden, isInverse]);
+    }, [teamA, teamB, scoreA, scoreB, setsA, setsB, timeoutsA, timeoutsB, isHidden, isInverse, anthemFlag]);
 
     const toggleTimeout = (team, index) => {
         if (team === "A") {
@@ -224,6 +226,13 @@ function Control() {
                                 ))}
                             </Select>
                         </FormControl>
+                        <Button
+                            variant="outlined"
+                            onClick={() => setAnthemFlag(teamA)}
+                            disabled={!!anthemFlag}
+                        >
+                            Display Anthem Flag
+                        </Button>
                         <Typography>Score</Typography>
                         <Stack direction="row" spacing={2} alignItems="center" mb={2}>
                             <Button
@@ -257,10 +266,14 @@ function Control() {
                             ))}
                         </Box>
                     </Stack>
-
-                    <Button variant="contained" color="success" onClick={changeSides}>
-                        Switch Sides
-                    </Button>
+                    <Stack direction="column" spacing={2} alignItems="center" mb={2}>
+                        <Button variant="contained" color="success" onClick={changeSides}>
+                            ⬅️Switch Sides➡️
+                        </Button>
+                        <Button variant="outlined" color="error" disabled={!anthemFlag} onClick={() => setAnthemFlag(null)}>
+                            Clear Anthem Flag
+                        </Button>
+                    </Stack>
                     {/* Team B */}
                     <Stack direction="column" spacing={2} alignItems="center" mb={2}>
                         <FormControl sx={{minWidth: 160}}>
@@ -277,7 +290,13 @@ function Control() {
                             </Select>
                         </FormControl>
 
-
+                        <Button
+                            variant="outlined"
+                            onClick={() => setAnthemFlag(teamB)}
+                            disabled={!!anthemFlag}
+                        >
+                            Display Anthem Flag
+                        </Button>
                         <Typography>Score</Typography>
                         <Stack direction="row" spacing={2} alignItems="center" mb={2}>
 
@@ -487,7 +506,20 @@ function Display() {
                 alignItems: "center",
             }}
         >
-            <Box sx={{pt: 8, height: "20vh", mb: 4}}>
+            {state.anthemFlag ?
+                (<img
+                    src={getFlagUrl(state.anthemFlag)}
+                    alt={state.teamB}
+                    style={{
+                        height: '100vh',
+                        objectFit: 'cover',
+                        marginTop: '8px',
+                        marginBottom: '8px',
+                    }}
+                />)
+                :
+                <>
+                <Box sx={{pt: 8, height: "20vh", mb: 4}}>
                 <Typography variant="h2" sx={{fontWeight: 800}}>CEV U16 Volleyball European Championship</Typography>
             </Box>
             <Box
@@ -501,6 +533,8 @@ function Display() {
                 {renderDisplay()}
                 {renderSetScore(state.isInverse)}
             </Box>
+                </>
+            }
         </Box>
     );
 }
