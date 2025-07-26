@@ -159,6 +159,27 @@ function Control() {
         setIsHidden(true);
     };
 
+    const changeSides = () => {
+      const newState = {
+          scoreA: scoreB,
+          scoreB: scoreA,
+            setsA: setsB,
+            setsB: setsA,
+            teamA: teamB,
+            teamB: teamA,
+            timeoutsA: timeoutsB,
+            timeoutsB: timeoutsA,
+      }
+      setScoreA(newState.scoreA);
+        setScoreB(newState.scoreB);
+        setSetsA(newState.setsA);
+        setSetsB(newState.setsB);
+        setTeamA(newState.teamA);
+        setTeamB(newState.teamB);
+        setTimeoutsA(newState.timeoutsA);
+        setTimeoutsB(newState.timeoutsB);
+    };
+
     return (
         <Container maxWidth="md" sx={{mt: 4}}>
             <Paper sx={{p: 3}}>
@@ -237,6 +258,9 @@ function Control() {
                         </Box>
                     </Stack>
 
+                    <Button variant="contained" color="success" onClick={changeSides}>
+                        Switch Sides
+                    </Button>
                     {/* Team B */}
                     <Stack direction="column" spacing={2} alignItems="center" mb={2}>
                         <FormControl sx={{minWidth: 160}}>
