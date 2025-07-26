@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import {HashRouter as Router, Routes, Route, Link} from "react-router-dom";
+import { HashRouter as Router, Routes, Route, Link } from "react-router-dom";
 import {
     Container,
     Button,
@@ -141,6 +141,8 @@ function Control() {
     const resetScores = () => {
         setScoreA(0);
         setScoreB(0);
+        setTimeoutsA([false, false]);
+        setTimeoutsB([false, false]);
     };
 
     const resetAll = () => {
