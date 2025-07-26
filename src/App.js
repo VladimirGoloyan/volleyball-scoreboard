@@ -15,7 +15,7 @@ import {
     FormControlLabel,
     Switch,
 } from "@mui/material";
-import logo from "./vfa.jpg";
+import logo from "./vfa.png";
 import am from "./flags/am.svg";
 import at from "./flags/at.svg";
 import bg from "./flags/bg.svg";
@@ -108,6 +108,7 @@ function Control() {
     const [timeoutsA, setTimeoutsA] = useState(initialState.timeoutsA || [false, false]);
     const [timeoutsB, setTimeoutsB] = useState(initialState.timeoutsB || [false, false]);
     const [isHidden, setIsHidden] = useState(initialState.isHidden || false);
+    const [isInverse, setIsInverse] = useState(initialState.isInverse || false);
 
     // ✅ Save state whenever something changes
     useEffect(() => {
@@ -121,10 +122,11 @@ function Control() {
             timeoutsA,
             timeoutsB,
             isHidden,
+            isInverse,
         };
         localStorage.setItem("scoreState", JSON.stringify(state));
         channel.postMessage(state);
-    }, [teamA, teamB, scoreA, scoreB, setsA, setsB, timeoutsA, timeoutsB, isHidden]);
+    }, [teamA, teamB, scoreA, scoreB, setsA, setsB, timeoutsA, timeoutsB, isHidden, isInverse]);
 
     const toggleTimeout = (team, index) => {
         if (team === "A") {
@@ -172,6 +174,16 @@ function Control() {
                         />
                     }
                     label="Hide Display (show logo)"
+                    sx={{mb: 3}}
+                />
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={isInverse}
+                            onChange={(e) => setIsInverse(e.target.checked)}
+                        />
+                    }
+                    label="Inverse Display (swap teams)"
                     sx={{mb: 3}}
                 />
                 <Stack direction="row" spacing={2} justifyContent="space-between" mb={3}>
@@ -315,6 +327,7 @@ function Display() {
         timeoutsA: [false, false],
         timeoutsB: [false, false],
         isHidden: false,
+        isInverse: false,
     });
 
     useEffect(() => {
@@ -341,11 +354,88 @@ function Display() {
         </Stack>
     );
 
+    const renderTeamA = () =>
+        <Box textAlign="center" sx={{width: "30vw"}}>
+            <Typography variant="h1">{state.teamA}</Typography>
+            <img
+                src={getFlagUrl(state.teamA)}
+                alt={state.teamA}
+                style={{
+                    width: 500, height: 300,
+                    objectFit: "cover",
+                    marginTop: 8
+                }}
+            />
+            {renderTimeouts(state.timeoutsA)}
+        </Box>
+
+        const renderTeamB = () =>
+            <Box textAlign="center" sx={{width: "30vw"}}>
+                <Typography variant="h1">{state.teamB}</Typography>
+                <img
+                    src={getFlagUrl(state.teamB)}
+                    alt={state.teamB}
+                    style={{
+                        width: 500, height: 300,
+                        objectFit: "cover",
+                        marginTop: 8
+                    }}
+                />
+                {renderTimeouts(state.timeoutsB)}
+            </Box>
+
+    const renderScore = (inverse) => {
+        return <Box sx={{width: "40vw", display: "flex", alignItems: "center"}}>
+            <Typography sx={{fontSize: "14vw", width: "20vw", textAlign: "center"}}>
+                {inverse ? state.scoreB : state.scoreA}
+            </Typography>
+            <Typography variant="h1" sx={{width: "10vw", textAlign: "center", fontSize: "10vw"}}>
+                -
+            </Typography>
+            <Typography sx={{fontSize: "14vw", width: "20vw", textAlign: "center"}}>
+                {inverse ? state.scoreA : state.scoreB}
+            </Typography>
+        </Box>
+    }
+
+    const renderSetScore = (inverse) => {
+        return <Box sx={{display: "flex", width: "15vw", justifyContent: "space-around"}}>
+            <Typography variant="h1">{inverse ? state.setsB : state.setsA}</Typography>
+            <Typography variant="h1">-</Typography>
+            <Typography variant="h1">{inverse ? state.setsA : state.setsB}</Typography>
+        </Box>
+    }
+
+    const renderDisplay = () => {
+       return  <Box
+            sx={{
+                display: "flex",
+                width: "100vw",
+                alignItems: "center",
+                justifyContent: "space-between",
+            }}
+        >
+           {state.isInverse ? (
+               <>
+                   {renderTeamB()}
+                   {renderScore(true)}
+                   {renderTeamA()}
+               </>
+           ) : (
+               <>
+                   {renderTeamA()}
+                   {renderScore(false)}
+                   {renderTeamB()}
+               </>
+           )}
+        </Box>
+    }
+
     if (state.isHidden) {
         return (
             <Box
                 sx={{
-                    backgroundColor: "#fff",
+                    backgroundColor: "#000",
                     height: "100vh",
                     display: "flex",
                     justifyContent: "center",
@@ -355,7 +445,7 @@ function Display() {
                 <img
                     src={logo}
                     alt="Logo"
-                    style={{maxWidth: "60%", maxHeight: "60%"}}
+                    style={{height: '100vh'}}
                 />
             </Box>
         );
@@ -384,60 +474,8 @@ function Display() {
                     alignItems: "center",
                 }}
             >
-                <Box
-                    sx={{
-                        display: "flex",
-                        width: "100vw",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                    }}
-                >
-                    <Box textAlign="center" sx={{width: "30vw"}}>
-                        <Typography variant="h1">{state.teamA}</Typography>
-                        <img
-                            src={getFlagUrl(state.teamA)}
-                            alt={state.teamA}
-                            style={{
-                                width: 500, height: 300,
-                                objectFit: "cover",
-                                marginTop: 8
-                            }}
-                        />
-                        {renderTimeouts(state.timeoutsA)}
-                    </Box>
-
-                    <Box sx={{width: "40vw", display: "flex", alignItems: "center"}}>
-                        <Typography sx={{fontSize: "14vw", width: "20vw", textAlign: "center"}}>
-                            {state.scoreA}
-                        </Typography>
-                        <Typography variant="h1" sx={{width: "10vw", textAlign: "center", fontSize: "10vw"}}>
-                            -
-                        </Typography>
-                        <Typography sx={{fontSize: "14vw", width: "20vw", textAlign: "center"}}>
-                            {state.scoreB}
-                        </Typography>
-                    </Box>
-
-                    <Box textAlign="center" sx={{width: "30vw"}}>
-                        <Typography variant="h1">{state.teamB}</Typography>
-                        <img
-                            src={getFlagUrl(state.teamB)}
-                            alt={state.teamB}
-                            style={{
-                                width: 500, height: 300,
-                                objectFit: "cover",
-                                marginTop: 8
-                            }}
-                        />
-                        {renderTimeouts(state.timeoutsB)}
-                    </Box>
-                </Box>
-
-                <Box sx={{display: "flex", width: "15vw", justifyContent: "space-around"}}>
-                    <Typography variant="h1">{state.setsA}</Typography>
-                    <Typography variant="h1">-</Typography>
-                    <Typography variant="h1">{state.setsB}</Typography>
-                </Box>
+                {renderDisplay()}
+                {renderSetScore(state.isInverse)}
             </Box>
         </Box>
     );
